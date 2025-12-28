@@ -37,8 +37,6 @@ jobs:
   test-with-model:
     name: Test with SAM3 model
     runs-on: ubuntu-latest
-    # Only run if HF_TOKEN secret is available
-    if: ${{ secrets.HF_TOKEN != '' }}
     
     steps:
     - uses: actions/checkout@v4

@@ -1,11 +1,9 @@
 """Tests for SAM3 API endpoints."""
 
 import base64
-import io
 
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
 
 
 class TestRootEndpoints:

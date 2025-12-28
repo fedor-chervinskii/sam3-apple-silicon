@@ -3,7 +3,7 @@
 import base64
 import io
 import os
-from typing import Generator, Optional
+from typing import Optional
 
 import pytest
 import torch
