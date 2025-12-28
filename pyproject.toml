@@ -29,6 +29,26 @@ dependencies = [
     "iopath>=0.1.10",
     "typing_extensions",
     "huggingface_hub",
+    # FastAPI dependencies
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0.0",
+    "opencv-python>=4.8.0",
+    "torch>=2.7.0",
+    "torchvision",
+    "torchaudio",
+    "einops",
+    "pycocotools",
+    "scikit-image",
+    "scikit-learn",
+    "psutil",
+    "python-dotenv",
+    # Test dependencies
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
 ]
 
 [project.optional-dependencies]
