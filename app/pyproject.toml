@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sam3-api"
+version = "0.1.0"
+description = "FastAPI service for SAM3 (Segment Anything Model 3)"
+readme = "app/README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "pydantic>=2.0.0",
+    "python-multipart>=0.0.9",
+    "pillow>=10.0.0",
+    "opencv-python>=4.8.0",
+    "numpy>=1.26",
+    "torch>=2.7.0",
+    "torchvision",
+    "torchaudio",
+    # SAM3 dependencies
+    "timm>=1.0.17",
+    "tqdm",
+    "ftfy==6.1.1",
+    "regex",
+    "iopath>=0.1.10",
+    "typing_extensions",
+    "huggingface_hub",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project.scripts]
+sam3-api = "app.main:app"

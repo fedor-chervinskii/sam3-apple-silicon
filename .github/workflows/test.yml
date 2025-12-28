@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-without-model:
+    name: Test without SAM3 model
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    
+    - name: Create virtual environment
+      run: uv venv
+    
+    - name: Install dependencies
+      run: |
+        uv pip install -e .
+        uv pip install fastapi "uvicorn[standard]" pydantic python-multipart opencv-python
+        uv pip install pytest pytest-asyncio httpx einops pycocotools scikit-image scikit-learn psutil
+    
+    - name: Run tests (model-independent)
+      run: uv run pytest app/tests/test_models.py app/tests/test_utils.py -v
+  
+  test-with-model:
+    name: Test with SAM3 model
+    runs-on: ubuntu-latest
+    # Only run if HF_TOKEN secret is available
+    if: ${{ secrets.HF_TOKEN != '' }}
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+    
+    - name: Create virtual environment
+      run: uv venv
+    
+    - name: Install dependencies
+      run: |
+        uv pip install -e .
+        uv pip install fastapi "uvicorn[standard]" pydantic python-multipart opencv-python
+        uv pip install pytest pytest-asyncio httpx einops pycocotools scikit-image scikit-learn psutil
+    
+    - name: Run all tests (with model)
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: uv run pytest app/tests/ -v
