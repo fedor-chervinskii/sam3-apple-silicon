@@ -1,8 +1,10 @@
 name: SAM3/ufmt
 on:
-  pull_request:
-    branches:
-    - main
+  # Disabled to avoid conflicts when merging upstream changes
+  # pull_request:
+  #   branches:
+  #   - main
+  workflow_dispatch:  # Can be manually triggered if needed
 jobs:
   ufmt_check:
     runs-on: ubuntu-latest
