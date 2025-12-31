@@ -1,7 +1,7 @@
 """Pydantic models for SAM3 API requests and responses."""
 
 from typing import List, Literal, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class PromptBox(BaseModel):
@@ -61,8 +61,8 @@ class SAM3Request(BaseModel):
         description="A unique identifier representing your end-user"
     )
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "image": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
                 "prompt": "person",
@@ -71,6 +71,7 @@ class SAM3Request(BaseModel):
                 "response_format": "b64_json"
             }
         }
+    )
 
 
 class ImageData(BaseModel):
@@ -89,8 +90,8 @@ class SAM3Response(BaseModel):
     created: int = Field(..., description="Unix timestamp (in seconds) of when the masks were created")
     data: List[ImageData] = Field(..., description="List of generated segmentation masks")
     
-    class Config:
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "created": 1640000000,
                 "data": [
@@ -102,3 +103,4 @@ class SAM3Response(BaseModel):
                 ]
             }
         }
+    )
