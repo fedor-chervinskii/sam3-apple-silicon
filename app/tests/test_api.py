@@ -35,28 +35,23 @@ class TestSAM3Endpoint:
         """Test SAM3 endpoint with text prompt."""
         response = client.post("/sam3", json=sample_text_request)
         
-        # Note: This test may fail if model is not loaded or if the model
-        # doesn't detect anything in the simple test image
-        # In a real deployment, you'd use a proper test image
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
-        if response.status_code == 200:
-            data = response.json()
-            assert "created" in data
-            assert "data" in data
-            assert isinstance(data["data"], list)
+        data = response.json()
+        assert "created" in data
+        assert "data" in data
+        assert isinstance(data["data"], list)
     
     def test_sam3_endpoint_with_box_prompt(self, client: TestClient, sample_box_request: dict):
         """Test SAM3 endpoint with box prompts."""
         response = client.post("/sam3", json=sample_box_request)
         
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
-        if response.status_code == 200:
-            data = response.json()
-            assert "created" in data
-            assert "data" in data
-            assert isinstance(data["data"], list)
+        data = response.json()
+        assert "created" in data
+        assert "data" in data
+        assert isinstance(data["data"], list)
     
     def test_sam3_endpoint_missing_prompts(self, client: TestClient, test_image_base64: str):
         """Test SAM3 endpoint fails when no prompts provided."""
@@ -86,8 +81,7 @@ class TestSAM3Endpoint:
         }
         response = client.post("/sam3", json=request)
         
-        # Should accept data URI format
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     
     def test_sam3_endpoint_custom_confidence(self, client: TestClient, test_image_base64: str):
         """Test SAM3 endpoint with custom confidence threshold."""
@@ -97,7 +91,7 @@ class TestSAM3Endpoint:
             "confidence_threshold": 0.3
         }
         response = client.post("/sam3", json=request)
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     
     def test_sam3_endpoint_invalid_confidence(self, client: TestClient, test_image_base64: str):
         """Test SAM3 endpoint with invalid confidence threshold."""
@@ -112,7 +106,7 @@ class TestSAM3Endpoint:
     def test_sam3_endpoint_combined_prompts(self, client: TestClient, sample_combined_request: dict):
         """Test SAM3 endpoint with both text and box prompts."""
         response = client.post("/sam3", json=sample_combined_request)
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     
     def test_sam3_endpoint_multiple_boxes(self, client: TestClient, test_image_base64: str):
         """Test SAM3 endpoint with multiple box prompts."""
@@ -124,40 +118,40 @@ class TestSAM3Endpoint:
             ]
         }
         response = client.post("/sam3", json=request)
-        assert response.status_code in [200, 500, 503]
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     
     def test_sam3_response_structure(self, client: TestClient, sample_text_request: dict):
         """Test that successful response has correct structure."""
         response = client.post("/sam3", json=sample_text_request)
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
         
-        if response.status_code == 200:
-            data = response.json()
+        data = response.json()
+        
+        # Check top-level fields
+        assert "created" in data
+        assert "data" in data
+        assert isinstance(data["created"], int)
+        assert isinstance(data["data"], list)
+        
+        # Check data structure if any results returned
+        if len(data["data"]) > 0:
+            result = data["data"][0]
+            assert "b64_json" in result
+            assert isinstance(result["b64_json"], str)
             
-            # Check top-level fields
-            assert "created" in data
-            assert "data" in data
-            assert isinstance(data["created"], int)
-            assert isinstance(data["data"], list)
+            # SAM3-specific fields (optional)
+            if "score" in result:
+                assert isinstance(result["score"], float)
+            if "bbox" in result:
+                assert isinstance(result["bbox"], list)
+                assert len(result["bbox"]) == 4
             
-            # Check data structure if any results returned
-            if len(data["data"]) > 0:
-                result = data["data"][0]
-                assert "b64_json" in result
-                assert isinstance(result["b64_json"], str)
-                
-                # SAM3-specific fields (optional)
-                if "score" in result:
-                    assert isinstance(result["score"], float)
-                if "bbox" in result:
-                    assert isinstance(result["bbox"], list)
-                    assert len(result["bbox"]) == 4
-                
-                # Verify b64_json is valid base64
-                try:
-                    mask_bytes = base64.b64decode(result["b64_json"])
-                    assert len(mask_bytes) > 0
-                except Exception:
-                    pytest.fail("b64_json is not valid base64")
+            # Verify b64_json is valid base64
+            try:
+                mask_bytes = base64.b64decode(result["b64_json"])
+                assert len(mask_bytes) > 0
+            except Exception:
+                pytest.fail("b64_json is not valid base64")
 
 
 class TestRequestValidation:
